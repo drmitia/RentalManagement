@@ -1,0 +1,18 @@
+@model RentalManagement.Web.Models.Properties.ConfirmDeleteViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">Confirm delete</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<form asp-controller="Properties" asp-action="@Model.ActionName" method="post" data-ajax-form data-refresh-target="#properties-list" data-refresh-url="@Url.Action("PropertiesList")">
+    <div class="modal-body">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ActionName" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <p>@Model.Message</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" name="confirm" value="true" class="btn btn-danger">Delete</button>
+    </div>
+</form>

@@ -1,0 +1,26 @@
+@model List<RentalManagement.Domain.Entities.Property>
+
+@if (Model.Count == 0)
+{
+    <p class="text-muted">No properties yet.</p>
+}
+
+@foreach (var property in Model)
+{
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <strong>@property.Name</strong>
+                <div class="text-muted small">@property.Address</div>
+            </div>
+            <div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-modal-url="@Url.Action("PropertyForm", new { id = property.Id })">Edit</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" data-modal-url="@Url.Action("DeleteProperty", new { id = property.Id })">Delete</button>
+                <button type="button" class="btn btn-sm btn-primary" data-modal-url="@Url.Action("UnitForm", new { propertyId = property.Id })">Add Unit</button>
+            </div>
+        </div>
+        <div class="card-body" id="units-for-property-@property.Id">
+            @await Component.InvokeAsync("UnitsList", new { propertyId = property.Id })
+        </div>
+    </div>
+}

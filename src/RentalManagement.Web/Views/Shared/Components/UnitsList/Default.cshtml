@@ -1,0 +1,52 @@
+@model RentalManagement.Web.Models.Properties.UnitsListViewModel
+
+@if (Model.Units.Count == 0)
+{
+    <p class="text-muted mb-0">No units yet.</p>
+}
+else
+{
+    <table class="table table-sm mb-0">
+        <thead>
+            <tr>
+                <th>Unit</th>
+                <th>Bedrooms</th>
+                <th>Type</th>
+                <th>Rent</th>
+                <th>Availability</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Units)
+            {
+                <tr>
+                    <td>@item.Unit.UnitNumber</td>
+                    <td>@item.Unit.Bedrooms</td>
+                    <td>
+                        @item.Unit.UnitType.Name
+                        @if (!item.Unit.UnitType.IsActive)
+                        {
+                            <span class="badge text-bg-secondary">inactive</span>
+                        }
+                    </td>
+                    <td>@item.Unit.MonthlyRent.ToString("C")</td>
+                    <td>
+                        @if (item.IsAvailable)
+                        {
+                            <span class="badge text-bg-success">Available</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-warning">Leased</span>
+                        }
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-modal-url="@Url.Action("UnitForm", "Properties", new { propertyId = Model.PropertyId, id = item.Unit.Id })">Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-modal-url="@Url.Action("DeleteUnit", "Properties", new { id = item.Unit.Id })">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

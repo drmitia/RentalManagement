@@ -1,0 +1,71 @@
+@model WizardViewModel
+@{
+    ViewData["Title"] = "Rental Application";
+}
+
+<h1>Application for @Model.Unit.Property.Name - Unit @Model.Unit.UnitNumber</h1>
+<p class="text-muted">Status: @Model.Status</p>
+
+@if (Model.ErrorMessage is not null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<ul class="nav nav-pills mb-3">
+    <li class="nav-item">
+        <span class="nav-link @(Model.Section == WizardSection.ApplicantInfo ? "active" : "") @(Model.IsApplicantInfoComplete ? "" : "")">1. Applicant Information</span>
+    </li>
+    <li class="nav-item">
+        <span class="nav-link @(Model.Section == WizardSection.ResidenceHistory ? "active" : "")">2. Residence History</span>
+    </li>
+    <li class="nav-item">
+        <span class="nav-link @(Model.Section == WizardSection.Summary ? "active" : "")">3. Summary</span>
+    </li>
+</ul>
+
+<form asp-controller="Applications" asp-action="Wizard" method="post">
+    <input type="hidden" asp-for="ApplicationId" />
+    <input type="hidden" asp-for="Section" />
+
+    @if (Model.Section == WizardSection.ApplicantInfo)
+    {
+        <partial name="_ApplicantInfoSection" model="Model.ApplicantInfo" />
+
+        <div class="mt-3">
+            <button type="submit" name="button" value="continue" class="btn btn-primary">Continue</button>
+        </div>
+    }
+    else if (Model.Section == WizardSection.ResidenceHistory)
+    {
+        <div id="residence-history-container-@Model.ApplicationId">
+            @await Component.InvokeAsync("ResidenceHistoryList", new { applicationId = Model.ApplicationId, isManagerView = false })
+        </div>
+
+        <div class="mt-3">
+            <a asp-action="Wizard" asp-route-id="@Model.ApplicationId" asp-route-section="ApplicantInfo" class="btn btn-outline-secondary">Back</a>
+            <button type="submit" name="button" value="continue" class="btn btn-primary">Continue</button>
+        </div>
+    }
+    else
+    {
+        <partial name="_SummarySection" model="Model" />
+
+        <div class="mt-3">
+            @if (Model.IsEditable)
+            {
+                <a asp-action="Wizard" asp-route-id="@Model.ApplicationId" asp-route-section="ResidenceHistory" class="btn btn-outline-secondary">Back</a>
+                <button type="submit" name="button" value="submit" class="btn btn-primary"
+                        disabled="@(!(Model.IsApplicantInfoComplete && Model.IsResidenceHistoryComplete))">
+                    Submit Application
+                </button>
+            }
+            @if (Model.Status is ApplicationStatus.Draft or ApplicationStatus.Submitted or ApplicationStatus.Returned)
+            {
+                <button type="submit" name="button" value="withdraw" class="btn btn-outline-danger"
+                        onclick="return confirm('Withdraw this application?');">
+                    Withdraw
+                </button>
+            }
+        </div>
+    }
+</form>

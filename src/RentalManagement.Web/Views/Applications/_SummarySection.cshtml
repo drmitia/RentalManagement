@@ -1,0 +1,19 @@
+@model WizardViewModel
+
+<h5>Applicant Information</h5>
+<partial name="_ApplicantInfoSection" model="new ApplicantInfoSectionViewModel {
+    ApplicationId = Model.ApplicationId,
+    FullName = Model.ApplicantInfo.FullName,
+    Phone = Model.ApplicantInfo.Phone,
+    Email = Model.ApplicantInfo.Email,
+    CurrentAddress = Model.ApplicantInfo.CurrentAddress,
+    IsEditable = false
+}" />
+
+<h5 class="mt-4">Residence History</h5>
+@await Component.InvokeAsync("ResidenceHistoryList", new { applicationId = Model.ApplicationId, isManagerView = false, forceReadOnly = true })
+
+@if (Model.IsEditable && !(Model.IsApplicantInfoComplete && Model.IsResidenceHistoryComplete))
+{
+    <div class="alert alert-warning mt-3">Complete both sections above before submitting.</div>
+}

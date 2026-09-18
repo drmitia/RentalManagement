@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RentalManagement.Domain/RentalManagement.Domain.csproj" />
+    <Project Path="src/RentalManagement.Infrastructure/RentalManagement.Infrastructure.csproj" />
+    <Project Path="src/RentalManagement.Web/RentalManagement.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RentalManagement.Tests/RentalManagement.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,85 @@
+@model List<RentalManagement.Domain.Entities.RentalApplication>
+@{
+    ViewData["Title"] = "Applications";
+    var isManager = User.IsInRole(Roles.PropertyManager);
+    ApplicationStatus? status = ViewBag.Status;
+    int? propertyId = ViewBag.PropertyId;
+    int page = ViewBag.Page;
+    int totalCount = ViewBag.TotalCount;
+    int pageSize = ViewBag.PageSize;
+    var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+}
+
+<h1>@(isManager ? "Applications" : "My Applications")</h1>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="status" class="form-select" onchange="this.form.submit()">
+            <option value="">All statuses</option>
+            @foreach (var s in Enum.GetValues<ApplicationStatus>())
+            {
+                <option value="@s" selected="@(status == s)">@s</option>
+            }
+        </select>
+    </div>
+    @if (isManager)
+    {
+        <div class="col-auto">
+            <select name="propertyId" asp-items="ViewBag.Properties" class="form-select" onchange="this.form.submit()">
+                <option value="">All properties</option>
+            </select>
+        </div>
+    }
+</form>
+
+@if (Model.Count == 0)
+{
+    <p class="text-muted">No applications found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Property / Unit</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var app in Model)
+            {
+                <tr>
+                    <td>@app.Unit.Property.Name - Unit @app.Unit.UnitNumber</td>
+                    <td>@app.Status</td>
+                    <td>@app.CreatedAt.ToString("d")</td>
+                    <td>
+                        @if (!isManager && app.Status is ApplicationStatus.Draft or ApplicationStatus.Returned)
+                        {
+                            <a asp-action="Wizard" asp-route-id="@app.Id" class="btn btn-sm btn-primary">Continue</a>
+                        }
+                        else
+                        {
+                            <a asp-action="Details" asp-route-id="@app.Id" class="btn btn-sm btn-outline-primary">View</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                @for (var p = 1; p <= totalPages; p++)
+                {
+                    <li class="page-item @(p == page ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-status="@status" asp-route-propertyId="@propertyId" asp-route-page="@p">@p</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}

@@ -1,0 +1,79 @@
+@model RentalManagement.Domain.Entities.RentalApplication
+@{
+    var userNames = (Dictionary<string, string>)ViewBag.UserNames;
+    var isManager = (bool)ViewBag.IsManager;
+}
+
+<h1>Application for @Model.Unit.Property.Name - Unit @Model.Unit.UnitNumber</h1>
+<p class="text-muted">Status: <strong>@Model.Status</strong></p>
+
+@if (isManager && Model.Status == ApplicationStatus.Submitted)
+{
+    <button type="button" class="btn btn-primary mb-3" data-modal-url="@Url.Action("Review", new { id = Model.Id })">
+        Review Application
+    </button>
+}
+else if (!isManager && Model.Status is ApplicationStatus.Draft or ApplicationStatus.Returned)
+{
+    <a asp-action="Wizard" asp-route-id="@Model.Id" class="btn btn-primary mb-3">Continue Application</a>
+}
+
+<h5>Applicant Information</h5>
+<dl class="row">
+    <dt class="col-sm-3">Full name</dt><dd class="col-sm-9">@Model.ApplicantInfo?.FullName</dd>
+    <dt class="col-sm-3">Phone</dt><dd class="col-sm-9">@Model.ApplicantInfo?.Phone</dd>
+    <dt class="col-sm-3">Email</dt><dd class="col-sm-9">@Model.ApplicantInfo?.Email</dd>
+    <dt class="col-sm-3">Current address</dt><dd class="col-sm-9">@Model.ApplicantInfo?.CurrentAddress</dd>
+</dl>
+
+<h5 class="mt-4">Residence History</h5>
+@if (Model.ResidenceHistory.Count == 0)
+{
+    <p class="text-muted">No prior residences.</p>
+}
+else
+{
+    <table class="table table-sm">
+        <thead>
+            <tr><th>Address</th><th>Landlord</th><th>Move-in</th><th>Move-out</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in Model.ResidenceHistory.OrderBy(r => r.MoveInDate))
+            {
+                <tr>
+                    <td>@entry.Address</td>
+                    <td>@entry.LandlordName &middot; @entry.LandlordPhone</td>
+                    <td>@entry.MoveInDate.ToString("d")</td>
+                    <td>@(entry.MoveOutDate?.ToString("d") ?? "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.Lease is not null)
+{
+    <h5 class="mt-4">Lease</h5>
+    <p>@Model.Lease.StartDate.ToString("d") - @Model.Lease.EndDate.ToString("d")</p>
+}
+
+@if (isManager)
+{
+    <h5 class="mt-4">Status History</h5>
+    <table class="table table-sm">
+        <thead>
+            <tr><th>When</th><th>Change</th><th>By</th><th>Comment</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var h in Model.StatusHistory.OrderBy(h => h.ChangedAt))
+            {
+                <tr>
+                    <td>@h.ChangedAt.ToString("g")</td>
+                    <td>@h.FromStatus &rarr; @h.ToStatus</td>
+                    <td>@(userNames.GetValueOrDefault(h.ChangedByUserId, h.ChangedByUserId))</td>
+                    <td>@h.Comment</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

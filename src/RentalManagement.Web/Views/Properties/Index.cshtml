@@ -1,0 +1,15 @@
+@model List<RentalManagement.Domain.Entities.Property>
+@{
+    ViewData["Title"] = "Properties";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Properties</h1>
+    <button type="button" class="btn btn-primary" data-modal-url="@Url.Action("PropertyForm")">
+        Add Property
+    </button>
+</div>
+
+<div id="properties-list">
+    <partial name="_PropertiesList" model="Model" />
+</div>

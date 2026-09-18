@@ -1,0 +1,20 @@
+@model ConfirmDeleteResidenceViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">Confirm remove</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<form asp-controller="Applications" asp-action="DeleteResidence" method="post" data-ajax-form
+      data-refresh-target="#residence-history-container-@Model.ApplicationId"
+      data-refresh-url="@Url.Action("ResidenceHistoryPartial", new { applicationId = Model.ApplicationId })">
+    <div class="modal-body">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ApplicationId" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <p>@Model.Message</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" name="confirm" value="true" class="btn btn-danger">Remove</button>
+    </div>
+</form>
